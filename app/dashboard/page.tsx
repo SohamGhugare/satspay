@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Bitcoin, RefreshCw } from 'lucide-react';
+import { Bitcoin, RefreshCw, ArrowRight } from 'lucide-react';
 import { DashboardCard } from '../components/dashboard-card';
 import { isConnected, getLocalStorage } from '@stacks/connect';
 
@@ -20,7 +20,6 @@ export default function Dashboard() {
       if (userData?.addresses?.stx?.[0]?.address) {
         setStxAddress(userData.addresses.stx[0].address);
       }
-      
     }
   }, [router]);
 
@@ -68,6 +67,25 @@ export default function Dashboard() {
   const borrowingPower = currentUsdEquivalent / 1.5;
   const borrowingPowerFormatted = `$${borrowingPower.toFixed(2)}`;
 
+  // Dummy loans data
+  const loans = [
+    {
+      title: "New Laptop",
+      lockedAmount: 0.024,
+      dueDate: "3/15/2025",
+    },
+    {
+      title: "Personal Loan",
+      lockedAmount: 0.002,
+      dueDate: "5/10/2025",
+    },
+    {
+      title: "Travel Loan",
+      lockedAmount: 0.05,
+      dueDate: "7/20/2025",
+    }
+  ];
+
   const handleToggle = () => {
     setIsSBTC(!isSBTC);
   };
@@ -80,7 +98,7 @@ export default function Dashboard() {
             Dashboard
           </h1>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           <DashboardCard
             title={
               <div className="flex items-center justify-center gap-2">
@@ -120,6 +138,48 @@ Locked: ${isSBTC ? sbtcLockedAmount : stxLockedAmount} ${isSBTC ? 'sBTC' : 'STX'
             }}
             subtext="Borrow USD against Stacks"
           />
+        </div>
+
+        {/* Active Loans Section */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Active Loans</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {loans.map((loan, index) => {
+              const loanAmount = loan.lockedAmount * btcPrice * 1.5;
+              return (
+                <div key={index} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">{loan.title}</h3>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-2">
+                        Active
+                      </span>
+                    </div>
+                    <button className="text-orange-400 hover:text-orange-500 transition-colors">
+                      <ArrowRight className="w-5 h-5" />
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-500">Loan Amount</span>
+                      <span className="text-sm font-medium text-gray-900">${loanAmount.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-500">Locked Stacks</span>
+                      <span className="text-sm font-medium text-gray-900">{loan.lockedAmount} sBTC</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-500">Due</span>
+                      <span className="text-sm font-medium text-gray-900">{loan.dueDate}</span>
+                    </div>
+                  </div>
+                  <button className="w-full mt-6 px-4 py-2 bg-orange-50 text-orange-400 rounded-lg hover:bg-orange-100 transition-colors font-medium">
+                    View Details
+                  </button>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </main>
     </div>
