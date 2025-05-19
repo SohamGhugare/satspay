@@ -1,7 +1,5 @@
 'use client';
 
-import { Bitcoin } from 'lucide-react';
-
 interface DashboardCardProps {
   title: string;
   value?: string;
@@ -23,7 +21,7 @@ export const DashboardCard = ({ title, value, secondaryValue, icon, badge, butto
     <div className="bg-gradient-to-b from-white to-gray-50 rounded-2xl border border-gray-100 p-8 
       shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(249,115,22,0.2)] 
       transition-all duration-300 hover:-translate-y-1">
-      <h2 className="text-2xl font-semibold text-gray-900 mb-8 text-center bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+      <h2 className="text-2xl font-semibold text-gray-900 mb-8 text-center bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text">
         {title}
       </h2>
       {button ? (
