@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { Bitcoin } from 'lucide-react';
-import { isConnected, getLocalStorage, disconnect } from '@stacks/connect';
+import { getLocalStorage, disconnect } from '@stacks/connect';
 
 export const WalletDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);

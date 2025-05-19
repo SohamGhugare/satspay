@@ -4,7 +4,7 @@ import { WalletConnectButton } from './wallet-connect-button';
 import { Bitcoin } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { isConnected, getLocalStorage } from '@stacks/connect';
+import { getLocalStorage } from '@stacks/connect';
 import toast from 'react-hot-toast';
 
 export const Navbar = () => {
