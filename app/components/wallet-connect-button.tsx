@@ -1,42 +1,49 @@
 'use client';
 
-import { useAuth, useAccount } from '@micro-stacks/react';
-import { WalletDropdown } from './wallet-dropdown';
-import { Bitcoin } from 'lucide-react';
+import { useState } from 'react';
+import { connect, disconnect, isConnected } from '@stacks/connect';
 import toast from 'react-hot-toast';
+import { WalletDropdown } from './wallet-dropdown';
 
 export const WalletConnectButton = () => {
-  const { openAuthRequest } = useAuth();
-  const { stxAddress } = useAccount();
+  const [isConnecting, setIsConnecting] = useState(false);
 
   const handleConnect = async () => {
     try {
-      toast.loading('Connecting wallet...', {
-        id: 'connecting',
-      });
-      await openAuthRequest();
-      toast.success('Successfully connected to wallet', {
-        id: 'connecting',
-      });
+      setIsConnecting(true);
+      await connect();
+      toast.success('Wallet connected successfully!');
     } catch (error) {
-      toast.error('Failed to connect to wallet', {
-        id: 'connecting',
-      });
-      console.log('Failed to connect to wallet: ', error);
+      console.error('Error connecting wallet:', error);
+      toast.error('Failed to connect wallet. Please try again.');
+    } finally {
+      setIsConnecting(false);
     }
   };
 
-  if (stxAddress) {
+  const handleDisconnect = () => {
+    try {
+      disconnect();
+      toast.success('Wallet disconnected successfully!');
+    } catch (error) {
+      console.error('Error disconnecting wallet:', error);
+      toast.error('Failed to disconnect wallet. Please try again.');
+    }
+  };
+
+  const isWalletConnected = isConnected();
+
+  if (isWalletConnected) {
     return <WalletDropdown />;
   }
 
   return (
     <button
-      onClick={handleConnect}
-      className="inline-flex items-center px-4 py-2 bg-orange-400 text-white rounded-lg hover:bg-orange-500 transition-colors font-semibold"
+      onClick={isWalletConnected ? handleDisconnect : handleConnect}
+      disabled={isConnecting}
+      className="px-4 py-2 bg-orange-400 text-white rounded-lg hover:bg-orange-500 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
     >
-      <Bitcoin className="w-4 h-4 mr-2" />
-      Connect Wallet
+      {isConnecting ? 'Connecting...' : isWalletConnected ? 'Disconnect Wallet' : 'Connect Wallet'}
     </button>
   );
 }; 

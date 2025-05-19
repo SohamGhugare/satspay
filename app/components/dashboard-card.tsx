@@ -1,7 +1,8 @@
 'use client';
+import { ReactNode } from 'react';
 
 interface DashboardCardProps {
-  title: string;
+  title: string | ReactNode;
   value?: string;
   secondaryValue?: string;
   icon?: React.ReactNode;

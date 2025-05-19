@@ -1,16 +1,23 @@
 'use client';
 
-import { useAccount, useAuth } from '@micro-stacks/react';
 import { useState, useRef, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { Bitcoin } from 'lucide-react';
+import { isConnected, getLocalStorage, disconnect } from '@stacks/connect';
 
 export const WalletDropdown = () => {
-  const { stxAddress } = useAccount();
-  const { signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [balance, setBalance] = useState<string>('0');
+  const [stxAddress, setStxAddress] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Get address from localStorage
+  useEffect(() => {
+    const userData = getLocalStorage();
+    if (userData?.addresses?.stx?.[0]?.address) {
+      setStxAddress(userData.addresses.stx[0].address);
+    }
+  }, []);
 
   // Fetch balance when address changes
   useEffect(() => {
@@ -50,11 +57,14 @@ export const WalletDropdown = () => {
       toast.loading('Disconnecting wallet...', {
         id: 'disconnecting',
       });
-      await signOut();
+      // Use the proper disconnect function
+      disconnect();
       toast.success('Successfully disconnected from wallet', {
         id: 'disconnecting',
       });
       setIsOpen(false);
+      // Reload the page to reset the state
+      window.location.reload();
     } catch (error) {
       toast.error('Failed to disconnect from wallet', {
         id: 'disconnecting',

@@ -1,20 +1,19 @@
 'use client';
 
-import { Bitcoin } from 'lucide-react';
-import { useAccount } from '@micro-stacks/react';
 import { useRouter } from 'next/navigation';
+import { isConnected } from '@stacks/connect';
 import toast from 'react-hot-toast';
+import { Bitcoin } from 'lucide-react';
 
 export default function Home() {
-  const { stxAddress } = useAccount();
   const router = useRouter();
 
-  const handleStartClick = () => {
-    if (stxAddress) {
-      router.push('/dashboard');
-    } else {
-      toast.error('Please connect to a wallet');
+  const handleStartWithSBTC = () => {
+    if (!isConnected()) {
+      toast.error('Please connect your wallet first');
+      return;
     }
+    router.push('/dashboard');
   };
 
   return (
@@ -38,12 +37,11 @@ export default function Home() {
           <p className="text-lg text-gray-600 max-w-2xl mb-12 leading-relaxed">
             SatsPay lets you shop online using your Bitcoin as collateral—without selling it. Get instant approval, flexible repayment terms, and keep your sats stacking.
           </p>
-          <div className="flex items-center space-x-4">
-            <button 
-              onClick={handleStartClick}
-              className="inline-flex items-center px-6 py-3 bg-orange-400 text-white rounded-lg hover:bg-orange-500 transition-colors font-semibold"
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button
+              onClick={handleStartWithSBTC}
+              className="px-6 py-3 bg-orange-400 text-white rounded-lg hover:bg-orange-500 transition-colors font-semibold"
             >
-              <Bitcoin className="w-5 h-5 mr-2" />
               Start with sBTC
             </button>
             <button className="px-6 py-3 bg-gray-50 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-semibold">
