@@ -59,6 +59,7 @@ export const WalletDropdown = () => {
       toast.error('Failed to disconnect from wallet', {
         id: 'disconnecting',
       });
+      console.error('Failed to disconnect from wallet:', error);
     }
   };
 
