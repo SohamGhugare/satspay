@@ -22,6 +22,7 @@ export const WalletConnectButton = () => {
       toast.error('Failed to connect to wallet', {
         id: 'connecting',
       });
+      console.log('Failed to connect to wallet: ', error);
     }
   };
 
