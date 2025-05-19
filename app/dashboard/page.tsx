@@ -2,15 +2,19 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Bitcoin, RefreshCw, ArrowRight } from 'lucide-react';
+import { Bitcoin, ArrowRight } from 'lucide-react';
 import { DashboardCard } from '../components/dashboard-card';
 import { isConnected, getLocalStorage } from '@stacks/connect';
 
+interface TokenBalance {
+  token: string;
+  balance: string;
+}
+
 export default function Dashboard() {
   const router = useRouter();
-  const [balance, setBalance] = useState<string>('0');
+  const [sbtcBalance, setSbtcBalance] = useState<string>('0');
   const [stxAddress, setStxAddress] = useState<string | null>(null);
-  const [isSBTC, setIsSBTC] = useState(true);
 
   useEffect(() => {
     if (!isConnected()) {
@@ -25,18 +29,20 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (stxAddress) {
-      // Fetch balance
-      const fetchBalance = async () => {
+      // Fetch sBTC balance
+      const fetchSbtcBalance = async () => {
         try {
-          const response = await fetch(`https://api.testnet.hiro.so/extended/v1/address/${stxAddress}/stx`);
+          const response = await fetch(`https://api.testnet.hiro.so/extended/v2/addresses/${stxAddress}/balances/ft`);
           const data = await response.json();
-          setBalance(data.balance || '0');
+          const sbtcToken = data.results.find((token: TokenBalance) => token.token.includes('sbtc-token'));
+          setSbtcBalance(sbtcToken?.balance || '0');
         } catch (error) {
-          console.error('Error fetching balance:', error);
-          setBalance('0');
+          console.error('Error fetching sBTC balance:', error);
+          setSbtcBalance('0');
         }
       };
-      fetchBalance();
+
+      fetchSbtcBalance();
     }
   }, [stxAddress]);
 
@@ -44,18 +50,9 @@ export default function Dashboard() {
     return null;
   }
 
-  const stxAmount = Number(balance) / 1000000;
-  const stxLockedAmount = (stxAmount * 0.2).toFixed(2);
-  const stxAvailableAmount = (stxAmount * 0.8).toFixed(2);
-
-  // STX values
-  const stxFormattedBalance = `${stxAmount.toFixed(2)} STX`;
-  const stxUsdEquivalent = stxAmount * 0.85;
-  const stxUsdFormatted = `$${stxUsdEquivalent.toFixed(2)}`;
-
-  // sBTC values (dummy data)
-  const sbtcAmount = 0.2; // Dummy sBTC amount
-  const btcPrice = 65000; // Current BTC price in USD
+  // sBTC values
+  const sbtcAmount = Number(sbtcBalance) / 100000000; // Convert from satoshis to sBTC
+  const btcPrice = 105197; // Current BTC price in USD
   const sbtcLockedAmount = (sbtcAmount * 0.2).toFixed(2);
   const sbtcAvailableAmount = (sbtcAmount * 0.8).toFixed(2);
   const sbtcFormattedBalance = `${sbtcAmount.toFixed(2)} sBTC`;
@@ -63,8 +60,7 @@ export default function Dashboard() {
   const sbtcUsdFormatted = `$${sbtcUsdEquivalent.toFixed(2)}`;
 
   // Calculate borrowing power based on current USD equivalent
-  const currentUsdEquivalent = isSBTC ? sbtcUsdEquivalent : stxUsdEquivalent;
-  const borrowingPower = currentUsdEquivalent / 1.5;
+  const borrowingPower = sbtcUsdEquivalent / 1.5;
   const borrowingPowerFormatted = `$${borrowingPower.toFixed(2)}`;
 
   // Dummy loans data
@@ -86,10 +82,6 @@ export default function Dashboard() {
     }
   ];
 
-  const handleToggle = () => {
-    setIsSBTC(!isSBTC);
-  };
-
   return (
     <div className="min-h-screen bg-white">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -100,23 +92,12 @@ export default function Dashboard() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           <DashboardCard
-            title={
-              <div className="flex items-center justify-center gap-2">
-                <span>Your Stacks Balance</span>
-                <button
-                  onClick={handleToggle}
-                  className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-                  title="Toggle between STX and sBTC"
-                >
-                  <RefreshCw className="w-4 h-4 text-gray-500" />
-                </button>
-              </div>
-            }
-            value={isSBTC ? sbtcFormattedBalance : stxFormattedBalance}
-            secondaryValue={isSBTC ? sbtcUsdFormatted : stxUsdFormatted}
+            title="Your sBTC Balance"
+            value={sbtcFormattedBalance}
+            secondaryValue={sbtcUsdFormatted}
             icon={<Bitcoin className="w-6 h-6 text-orange-400" />}
-            subtext={`Available: ${isSBTC ? sbtcAvailableAmount : stxAvailableAmount} ${isSBTC ? 'sBTC' : 'STX'}
-Locked: ${isSBTC ? sbtcLockedAmount : stxLockedAmount} ${isSBTC ? 'sBTC' : 'STX'}`}
+            subtext={`Available: ${sbtcAvailableAmount} sBTC
+Locked: ${sbtcLockedAmount} sBTC`}
           />
           <DashboardCard
             title="Borrowing Power"
@@ -125,7 +106,7 @@ Locked: ${isSBTC ? sbtcLockedAmount : stxLockedAmount} ${isSBTC ? 'sBTC' : 'STX'
               text: "80% LTV",
               color: "bg-orange-50 text-orange-400"
             }}
-            subtext="Based on your available Stacks balance"
+            subtext="Based on your available sBTC balance"
           />
           <DashboardCard
             title="Loan"
@@ -135,7 +116,7 @@ Locked: ${isSBTC ? sbtcLockedAmount : stxLockedAmount} ${isSBTC ? 'sBTC' : 'STX'
                 router.push('/purchase');
               }
             }}
-            subtext="Borrow USD against Stacks"
+            subtext="Borrow USD against sBTC"
           />
         </div>
 
@@ -164,7 +145,7 @@ Locked: ${isSBTC ? sbtcLockedAmount : stxLockedAmount} ${isSBTC ? 'sBTC' : 'STX'
                       <span className="text-sm font-medium text-gray-900">${loanAmount.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-500">Locked Stacks</span>
+                      <span className="text-sm text-gray-500">Locked sBTC</span>
                       <span className="text-sm font-medium text-gray-900">{loan.lockedAmount} sBTC</span>
                     </div>
                     <div className="flex justify-between items-center">

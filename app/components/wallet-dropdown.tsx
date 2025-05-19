@@ -5,37 +5,43 @@ import toast from 'react-hot-toast';
 import { Bitcoin } from 'lucide-react';
 import { getLocalStorage, disconnect } from '@stacks/connect';
 
+interface TokenBalance {
+  token: string;
+  balance: string;
+}
+
 export const WalletDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [balance, setBalance] = useState<string>('0');
-  const [stxAddress, setStxAddress] = useState<string | null>(null);
+  const [address, setAddress] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Get address from localStorage
   useEffect(() => {
     const userData = getLocalStorage();
     if (userData?.addresses?.stx?.[0]?.address) {
-      setStxAddress(userData.addresses.stx[0].address);
+      setAddress(userData.addresses.stx[0].address);
     }
   }, []);
 
   // Fetch balance when address changes
   useEffect(() => {
     const fetchBalance = async () => {
-      if (stxAddress) {
+      if (address) {
         try {
-          const response = await fetch(`https://api.hiro.so/extended/v2/addresses/${stxAddress}/balances/stx`);
+          const response = await fetch(`https://api.testnet.hiro.so/extended/v2/addresses/${address}/balances/ft`);
           const data = await response.json();
-          setBalance(data.balance || '0');
+          const sbtcToken = data.results.find((token: TokenBalance) => token.token.includes('sbtc-token'));
+          setBalance(sbtcToken?.balance || '0');
         } catch (error) {
-          console.error('Error fetching balance:', error);
+          console.error('Error fetching sBTC balance:', error);
           setBalance('0');
         }
       }
     };
 
     fetchBalance();
-  }, [stxAddress]);
+  }, [address]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -49,21 +55,19 @@ export const WalletDropdown = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const shortAddress = stxAddress ? `${stxAddress.slice(0, 6)}...${stxAddress.slice(-4)}` : '';
-  const formattedBalance = `${(Number(balance) / 1000000).toFixed(6)} STX`;
+  const shortAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : '';
+  const formattedBalance = `${(Number(balance) / 100000000).toFixed(2)} sBTC`;
 
   const handleDisconnect = async () => {
     try {
       toast.loading('Disconnecting wallet...', {
         id: 'disconnecting',
       });
-      // Use the proper disconnect function
       disconnect();
       toast.success('Successfully disconnected from wallet', {
         id: 'disconnecting',
       });
       setIsOpen(false);
-      // Reload the page to reset the state
       window.location.reload();
     } catch (error) {
       toast.error('Failed to disconnect from wallet', {
