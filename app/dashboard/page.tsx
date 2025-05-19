@@ -172,9 +172,15 @@ Locked: ${isSBTC ? sbtcLockedAmount : stxLockedAmount} ${isSBTC ? 'sBTC' : 'STX'
                       <span className="text-sm font-medium text-gray-900">{loan.dueDate}</span>
                     </div>
                   </div>
-                  <button className="w-full mt-6 px-4 py-2 bg-orange-50 text-orange-400 rounded-lg hover:bg-orange-100 transition-colors font-medium">
-                    View Details
-                  </button>
+                  <div className="flex gap-3 mt-6">
+                    <button className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-bold">
+                      View Details
+                    </button>
+                    <button className="flex-1 px-4 py-2 bg-orange-50 text-orange-500 border border-orange-400 rounded-lg 
+                      hover:bg-orange-100 transition-all duration-300 font-bold">
+                      Pay Installment
+                    </button>
+                  </div>
                 </div>
               );
             })}
