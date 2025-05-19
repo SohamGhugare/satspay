@@ -132,8 +132,7 @@ Locked: ${isSBTC ? sbtcLockedAmount : stxLockedAmount} ${isSBTC ? 'sBTC' : 'STX'
             button={{
               text: "+ Start New Purchase",
               onClick: () => {
-                // Handle new purchase
-                console.log('Start new purchase');
+                router.push('/purchase');
               }
             }}
             subtext="Borrow USD against Stacks"
