@@ -1,12 +1,24 @@
 'use client';
 
-import { Navbar } from './components/navbar';
 import { Bitcoin } from 'lucide-react';
+import { useAccount } from '@micro-stacks/react';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 export default function Home() {
+  const { stxAddress } = useAccount();
+  const router = useRouter();
+
+  const handleStartClick = () => {
+    if (stxAddress) {
+      router.push('/dashboard');
+    } else {
+      toast.error('Please connect to a wallet');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex flex-col items-center text-center min-h-[70vh] justify-center">
           <div className="mb-8">
@@ -27,7 +39,10 @@ export default function Home() {
             SatsPay lets you shop online using your Bitcoin as collateral—without selling it. Get instant approval, flexible repayment terms, and keep your sats stacking.
           </p>
           <div className="flex items-center space-x-4">
-            <button className="inline-flex items-center px-6 py-3 bg-orange-400 text-white rounded-lg hover:bg-orange-500 transition-colors font-semibold">
+            <button 
+              onClick={handleStartClick}
+              className="inline-flex items-center px-6 py-3 bg-orange-400 text-white rounded-lg hover:bg-orange-500 transition-colors font-semibold"
+            >
               <Bitcoin className="w-5 h-5 mr-2" />
               Start with sBTC
             </button>
