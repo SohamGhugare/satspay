@@ -4,12 +4,11 @@ import { WalletConnectButton } from './wallet-connect-button';
 import { Bitcoin } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { getLocalStorage } from '@stacks/connect';
+import { isConnected } from '@stacks/connect';
 import toast from 'react-hot-toast';
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [stxAddress, setStxAddress] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,18 +19,11 @@ export const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Get address from localStorage
-  useEffect(() => {
-    const userData = getLocalStorage();
-    if (userData?.addresses?.stx?.[0]?.address) {
-      setStxAddress(userData.addresses.stx[0].address);
-    }
-  }, []);
 
   const handleDashboardClick = (e: React.MouseEvent) => {
-    if (!stxAddress) {
+    if (!isConnected()) {
       e.preventDefault();
-      toast.error('Please connect to a wallet');
+      toast.error('Please connect your wallet first');
     }
   };
 
