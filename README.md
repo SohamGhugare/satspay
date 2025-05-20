@@ -41,9 +41,9 @@ SatsPay allows users to lock their sBTC as collateral to borrow USD. The platfor
 
 ## Getting Started
 
-1. Install dependencies:
+1. Run yarn:
    ```bash
-   npm install
+   yarn dev
    ```
 
 2. Start the development environment:
