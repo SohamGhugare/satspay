@@ -1,0 +1,28 @@
+[project]
+name = "satspay"
+description = "A decentralized lending platform using sBTC as collateral"
+authors = ["SatsPay Team"]
+version = "0.1.0"
+
+[contracts]
+loan = "contracts/loan.clar"
+sbtc-token = "contracts/sbtc-token.clar"
+collateral = "contracts/collateral.clar"
+
+[requirements]
+clarinet = ">=1.0.0"
+
+[devnet]
+disable_stacks_explorer = false
+disable_stacks_api = false
+working_dir = "devnet"
+deployment_fee_rate = 10
+network = "testnet"
+
+[network.testnet]
+name = "testnet"
+deployment_fee_rate = 10
+
+[network.mainnet]
+name = "mainnet"
+deployment_fee_rate = 10 
